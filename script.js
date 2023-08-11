@@ -199,44 +199,74 @@ function mostrarHistorial() {
   }
 }
 
-function pagarSos(){
-  const resultadoDiv = document.getElementById("resultado");
-  resultadoDiv.classList.remove("hidden")
+// function pagarSos(){
+//   const resultadoDiv = document.getElementById("resultado");
+//   resultadoDiv.classList.remove("hidden")
 
-  Swal.fire({
-    title: 'Ingrese el monto a pagar',
-    input: 'text',
-    inputAttributes: {
-      autocapitalize: 'off'
-    },
-    showCancelButton: true,
-    confirmButtonText: 'Look up',
-    showLoaderOnConfirm: true,
-    preConfirm: (login) => {
-      return fetch(`//api.github.com/users/${login}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(response.statusText)
-          }
-          return response.json()
-        })
-        .catch(error => {
-          Swal.showValidationMessage(
-            `Request failed: ${error}`
-          )
-        })
-    },
-    allowOutsideClick: () => !Swal.isLoading()
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire({
-        title: `${result.value.login}'s avatar`,
-        imageUrl: result.value.avatar_url
-      })
-    }
-  })
+//   Swal.fire({
+//     title: 'Ingrese el monto a pagar',
+//     input: 'text',
+//     inputAttributes: {
+//       autocapitalize: 'off'
+//     },
+//     showCancelButton: true,
+//     confirmButtonText: 'Look up',
+//     showLoaderOnConfirm: true,
+//     preConfirm: (login) => {
+//       return fetch(`//api.github.com/users/${login}`)
+//         .then(response => {
+//           if (!response.ok) {
+//             throw new Error(response.statusText)
+//           }
+//           return response.json()
+//         })
+//         .catch(error => {
+//           Swal.showValidationMessage(
+//             `Request failed: ${error}`
+//           )
+//         })
+//     },
+//     allowOutsideClick: () => !Swal.isLoading()
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       Swal.fire({
+//         title: `${result.value.login}'s avatar`,
+//         imageUrl: result.value.avatar_url
+//       })
+//     }
+//   })
 
 
 
-}
-
+// }
+$(document).ready(function() {
+  const historialContainer = document.querySelector('#historialContainer');
+  const historialLista = document.querySelector('#historialLista');
+  
+  function cargarHistorial() {
+    $.ajax({
+      url: './json/historial_recargas.json', // Reemplaza con la URL real de tu servidor o API
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        if (data && data.historialRecargas) {
+          historialContainer.show();
+          historialLista.empty();
+          
+          data.historialRecargas.forEach(recarga => {
+            const li = $('<li>').text(`Recarga de $${recarga.monto.toFixed(2)} en ${recarga.fecha}`);
+            historialLista.append(li);
+          });
+        } else {
+          historialContainer.hide();
+        }
+      },
+      error: function() {
+        console.error('Error al cargar el historial de recargas');
+      }
+    });
+  }
+  
+  // Mostrar automáticamente el historial al cargar la página
+  cargarHistorial();
+});
